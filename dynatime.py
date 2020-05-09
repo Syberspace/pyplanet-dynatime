@@ -43,7 +43,7 @@ class DynatimeApp(AppConfig):
 			self.setting_dynatime_active, self.setting_dynatime_multiplier
 		)
 		
-		self.context.signals.listen(mp_signals.flow.loading_map_end, self.on_load_end)
+		self.context.signals.listen(mp_signals.map.map_begin, self.on_map_begin)
 		
 
 	async def on_stop(self):
@@ -52,7 +52,7 @@ class DynatimeApp(AppConfig):
 	async def on_destroy(self):
 		await super().on_destroy()
 
-	async def on_load_end(self, map, **kwargs):
+	async def on_map_begin(self, map, **kwargs):
 		is_active  = await self.setting_dynatime_active.get_value()
 
 		if not is_active:
