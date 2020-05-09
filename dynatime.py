@@ -26,6 +26,12 @@ class DynatimeApp(AppConfig):
 			description='Activate Dynamic Round timer based on map bronze time',
 			default=True
 		)
+
+		self.setting_dynatime_announce = Setting(
+			'dynatime_accounce', 'Dynatime Accounce', Setting.CAT_BEHAVIOUR, type=bool,
+			description='Announce the current timelimit at the start of each round',
+			default=True
+		)
 		
 		self.setting_dynatime_multiplier = Setting(
 			'dynatime_multiplier', 'Dynatime Multiplier', Setting.CAT_BEHAVIOUR, type=int,
@@ -40,7 +46,9 @@ class DynatimeApp(AppConfig):
 		await super().on_start()
 
 		await self.context.setting.register(
-			self.setting_dynatime_active, self.setting_dynatime_multiplier
+			self.setting_dynatime_active,
+			self.setting_dynatime_announce,
+			self.setting_dynatime_multiplier,
 		)
 		
 		self.context.signals.listen(mp_signals.map.map_begin, self.on_map_begin)
@@ -78,4 +86,6 @@ class DynatimeApp(AppConfig):
 
 		await self.instance.mode_manager.update_settings(mode_settings)
 	
-		await self.instance.chat(chat_message)	
+		announce = await self.setting_dynatime_announce.get_value()
+		if announce:
+			await self.instance.chat(chat_message)
